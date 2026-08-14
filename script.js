@@ -75,7 +75,7 @@ function getClientLocation() {
       
       if (locBtn) locBtn.disabled = false;
 
-      // Render ng Live Map Image
+      // Render ng Live Map Image (Kasama ang Shop at Client Location)
       renderClientMap(clientLat, clientLng);
 
       // I-update ang resibo
@@ -94,16 +94,16 @@ function getClientLocation() {
   );
 }
 
-// Function para mag-draw ng Map sa Resibo
+// Function para mag-draw ng Map sa Resibo (May Permanent Labels sa Pin)
 function renderClientMap(lat, lng) {
   const mapContainer = document.getElementById("receiptMapContainer");
   const gmapLink = document.getElementById("googleMapsLink");
 
   if (mapContainer) mapContainer.style.display = "block";
 
-  // Google Maps Direct Link
+  // Google Maps Direct Route Link (Mula Shop hanggang Client)
   if (gmapLink) {
-    gmapLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
+    gmapLink.href = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${lat},${lng}`;
   }
 
   // Render Leaflet Map Visual
@@ -112,17 +112,39 @@ function renderClientMap(lat, lng) {
       mapInstance.remove(); // Reset map kung re-clicked
     }
 
-    mapInstance = L.map('receiptMap').setView([lat, lng], 15);
+    mapInstance = L.map('receiptMap');
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(mapInstance);
 
-    // Pin marker sa exact client location
-    L.marker([lat, lng]).addTo(mapInstance)
-      .bindPopup("📍 Client Exact Location")
-      .openPopup();
+    // 1. Marker para sa TECH / SHOP LOCATION (May Nakalitaw na Label)
+    const shopMarker = L.marker([SHOP_LAT, SHOP_LNG]).addTo(mapInstance)
+      .bindTooltip("👨‍🔧 Tech Location", { 
+        permanent: true, 
+        direction: 'top',
+        className: 'map-label-tech'
+      });
+
+    // 2. Marker para sa CLIENT LOCATION (May Nakalitaw na Label)
+    const clientMarker = L.marker([lat, lng]).addTo(mapInstance)
+      .bindTooltip("📍 Client Location", { 
+        permanent: true, 
+        direction: 'top',
+        className: 'map-label-client'
+      });
+
+    // 3. Guhit / Linya mula sa Shop papunta sa Client
+    const latlngs = [
+      [SHOP_LAT, SHOP_LNG],
+      [lat, lng]
+    ];
+    L.polyline(latlngs, { color: '#38bdf8', weight: 3, dashArray: '5, 10' }).addTo(mapInstance);
+
+    // I-fit ang mapa para kitang-kita pareho ang Shop at Client
+    const group = new L.featureGroup([shopMarker, clientMarker]);
+    mapInstance.fitBounds(group.getBounds().pad(0.3));
   }
 }
 
@@ -213,7 +235,7 @@ function calculatePCTotal() {
   }
 }
 
-// Event Listeners
+// Event Listeners & Initialization
 document.addEventListener("DOMContentLoaded", function() {
   const elementsToWatch = [
     "pcServiceSelect",
@@ -232,6 +254,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   calculatePCTotal();
+  showSlides(slideIndex); // Simulan ang Slideshow sa pag-load ng page
 });
 
 // ==========================================
@@ -296,9 +319,9 @@ function sendPCBooking(event) {
     const clientAddress = document.getElementById("clientAddress") ? document.getElementById("clientAddress").value : "";
     const total = document.getElementById("pcTotalPrice") ? document.getElementById("pcTotalPrice").textContent : "";
     const distText = `${clientDistanceKM.toFixed(2)} km`;
-    const gmapsUrl = `https://www.google.com/maps?q=${clientLat},${clientLng}`;
+    const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${clientLat},${clientLng}`;
 
-    const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nName: ${clientName}\nAddress: ${clientAddress}\nDistance: ${distText}\nMap: ${gmapsUrl}\nTotal: ${total}`);
+    const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nName: ${clientName}\nAddress: ${clientAddress}\nDistance: ${distText}\nMap Route: ${gmapsUrl}\nTotal: ${total}`);
     const messengerUrl = `https://m.me/${messengerUsername}?text=${textMsg}`;
     
     const messengerBtn = document.getElementById("proceedMessengerBtn");
@@ -324,4 +347,39 @@ function sendPCBooking(event) {
 function closeReceiptModal() {
   const modal = document.getElementById("receiptModal");
   if (modal) modal.classList.remove("active");
+}
+
+// ==========================================
+// 6. SLIDESHOW / GALLERY CONTROLLER
+// ==========================================
+let slideIndex = 1;
+
+function changeSlide(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName("slide");
+  let dots = document.getElementsByClassName("dot");
+  if (!slides || slides.length === 0) return;
+  
+  if (n > slides.length) { slideIndex = 1 }
+  if (n < 1) { slideIndex = slides.length }
+  
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace(" active", "");
+  }
+  
+  slides[slideIndex-1].style.display = "block";
+  if (dots[slideIndex-1]) {
+    dots[slideIndex-1].className += " active";
+  }
 }
