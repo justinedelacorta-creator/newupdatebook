@@ -6,8 +6,14 @@
   <title>PC Repair & Home Service Specialist</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS & JS para sa Libreng Interactive Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <!-- HTML2Canvas Library para sa Image Generator ng Resibo -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
   <script>
   (function() {
     // 1. Suriin kung ang user ay gumagamit ng Android Mobile
@@ -22,17 +28,12 @@
 
     // 3. Kung Android at In-App Browser, I-FORCE buksan sa Chrome!
     if (isAndroid && isInApp) {
-      // Kunin ang kasalukuyang URL at alisin ang 'https://'
       var currentUrl = window.location.href.replace(/^https?:\/\//, '');
-      
-      // Intent URL Format para sa Google Chrome Android App
       var chromeIntent = "intent://" + currentUrl + "#Intent;scheme=https;package=com.android.chrome;end";
-      
-      // I-redirect sa Chrome
       window.location.href = chromeIntent;
     }
   })();
-</script>
+  </script>
 </head>
 <body>
 
@@ -133,73 +134,73 @@
         <div class="rate-icon"><i class="fa-solid fa-house-chimney"></i></div>
         <div class="rate-info">
           <h3>Home Service Fee</h3>
-          <p>Home service fee depending on your location.</p>
+          <p>Home service base fee (≤7.5km standard rate).</p>
         </div>
-        <div class="rate-price">₱350+</div>
+        <div class="rate-price">₱350</div>
       </div>
     </div>
   </section>
 
- <!-- Photo / Video Gallery Section (Slideshow) -->
-<section id="gallery" class="section dark-bg">
-  <h2 class="section-title">Actual Home Service Projects</h2>
-  <p class="section-subtitle">Real photos from PCs repaired right at clients' homes</p>
+  <!-- Photo / Video Gallery Section (Slideshow) -->
+  <section id="gallery" class="section dark-bg">
+    <h2 class="section-title">Actual Home Service Projects</h2>
+    <p class="section-subtitle">Real photos from PCs repaired right at clients' homes</p>
 
-  <div class="slideshow-container">
-    <!-- Slide Items -->
-    <div class="slide fade">
-      <img src="image/image1.jpg" alt="PC Repair Work">
-      <div class="slide-caption">
-        <h3>Satisfied Customers</h3>
-        <p>Costumers</p>
+    <div class="slideshow-container">
+      <div class="slide fade">
+        <img src="image/image1.jpg" alt="PC Repair Work">
+        <div class="slide-caption">
+          <h3>Satisfied Customers</h3>
+          <p>Customers</p>
+        </div>
+      </div>
+
+      <div class="slide fade">
+        <img src="image/image2.jpg" alt="Laptop Deep Cleaning">
+        <div class="slide-caption">
+          <h3>Laptop Deep Cleaning & Thermal Repaste</h3>
+          <p>Overheating Issue Fixed</p>
+        </div>
+      </div>
+
+      <div class="slide fade">
+        <img src="image/image4.jpg" alt="PC Assembly">
+        <div class="slide-caption">
+          <h3>Full PC Assembly & Cable Management</h3>
+          <p>Non-Generic Gaming Case Setup</p>
+        </div>
+      </div>
+
+      <div class="slide fade">
+        <img src="image/image5.jpg" alt="PC Assembly">
+        <div class="slide-caption">
+          <h3>Pisonet Setup and Troubleshooting</h3>
+          <p>PC/Laptop Blue Screen & System Crash Repair</p>
+        </div>
+      </div>
+
+      <div class="slide fade">
+        <img src="image/image3.jpg" alt="PC Assembly">
+        <div class="slide-caption">
+          <h3>PC/Laptop Blue Screen (BSOD) & System Error Fix</h3>
+          <p>Assemble pisonet</p>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <button type="button" class="prev-slide" onclick="changeSlide(-1)">&#10094;</button>
+      <button type="button" class="next-slide" onclick="changeSlide(1)">&#10095;</button>
+
+      <!-- Slide Indicators (Dots) -->
+      <div class="dots-container">
+        <span class="dot" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
+        <span class="dot" onclick="currentSlide(4)"></span>
+        <span class="dot" onclick="currentSlide(5)"></span>
       </div>
     </div>
-
-    <div class="slide fade">
-      <img src="image/image2.jpg" alt="Laptop Deep Cleaning">
-      <div class="slide-caption">
-        <h3>Laptop Deep Cleaning & Thermal Repaste</h3>
-        <p>Overheating Issue Fixed</p>
-      </div>
-    </div>
-
-    <div class="slide fade">
-      <img src="image/image4.jpg" alt="PC Assembly">
-      <div class="slide-caption">
-        <h3>Full PC Assembly & Cable Management</h3>
-        <p>Non-Generic Gaming Case Setup</p>
-      </div>
-    </div>
-
-    <div class="slide fade">
-      <img src="image/image5.jpg" alt="PC Assembly">
-      <div class="slide-caption">
-        <h3>Pisonet Setup and Troubleshooting</h3>
-        <p>PC/Laptop Blue Screen & System Crash Repair</p>
-      </div>
-    </div>
-    <div class="slide fade">
-      <img src="image/image3.jpg" alt="PC Assembly">
-      <div class="slide-caption">
-        <h3>PC/Laptop Blue Screen (BSOD) & System Error Fix</h3>
-        <p>Assemble pesonet</p>
-      </div>
-    </div>
-
-    <!-- Navigation Buttons -->
-    <button class="prev-slide" onclick="changeSlide(-1)">&#10094;</button>
-    <button class="next-slide" onclick="changeSlide(1)">&#10095;</button>
-
-    <!-- Slide Indicators (Dots) -->
-    <div class="dots-container">
-      <span class="dot" onclick="currentSlide(1)"></span>
-      <span class="dot" onclick="currentSlide(2)"></span>
-      <span class="dot" onclick="currentSlide(3)"></span>
-      <span class="dot" onclick="currentSlide(4)"></span>
-      <span class="dot" onclick="currentSlide(5)"></span>
-    </div>
-  </div>
-</section>
+  </section>
 
   <!-- Interactive PC Calculator & Booking Section -->
   <section id="calculator" class="section">
@@ -228,15 +229,6 @@
           <input type="number" id="unitQuantity" class="form-control" min="1" max="10" value="1" oninput="calculatePCTotal()" onchange="calculatePCTotal()" required>
         </div>
 
-        <!-- Home Service Distance / Location Fee -->
-        <div class="form-group">
-          <label for="locationFeeSelect"><i class="fa-solid fa-location-dot"></i> Home Service Fee / Location:</label>
-          <select id="locationFeeSelect" class="form-control" onchange="calculatePCTotal()" required>
-            <option value="350" data-name="Standard Home Visit Fee">Standard Home Visit Fee — +₱350</option>
-            <option value="0" data-name="Shop Drop-off / Meetup">Shop Visit / Drop-off (Walang Fee) — ₱0</option>
-          </select>
-        </div>
-
         <!-- Details Input -->
         <div class="form-group">
           <label for="clientName"><i class="fa-solid fa-user"></i> Buong Pangalan:</label>
@@ -244,8 +236,14 @@
         </div>
 
         <div class="form-group">
-          <label for="clientAddress"><i class="fa-solid fa-map-pin"></i> Kumpletong Sektor / Address:</label>
+          <label for="clientAddress"><i class="fa-solid fa-map-pin"></i> Kumpletong Address / Lokasyon:</label>
           <input type="text" id="clientAddress" class="form-control" placeholder="hal. Brgy. San Jose, Block 2 Lot 5" oninput="calculatePCTotal()" required>
+          
+          <!-- GPS Button & Status -->
+          <button type="button" id="getLocBtn" class="btn-location" onclick="getClientLocation()" style="margin-top: 8px;">
+            <i class="fa-solid fa-location-crosshairs"></i> Gamitin ang Aking Live Location
+          </button>
+          <div id="locationStatus" class="location-status-text"></div>
         </div>
 
         <div class="form-group">
@@ -266,66 +264,41 @@
               <span>Customer:</span>
               <strong id="receiptClientName">---</strong>
             </div>
+            
             <div class="receipt-row">
               <span>Address:</span>
               <strong id="receiptAddress">---</strong>
             </div>
+
+            <!-- 📍 LIVE LOCATION MAP (IN-RECEIPT) -->
+            <div id="receiptMapContainer" style="margin: 12px 0; display: none;">
+              <div id="receiptMap" style="height: 160px; width: 100%; border-radius: 8px; border: 1px solid #334155;"></div>
+              <a id="googleMapsLink" href="#" target="_blank" style="display: block; text-align: center; margin-top: 6px; font-size: 11px; color: #38bdf8; text-decoration: underline;">
+                📍 I-open sa Google Maps App
+              </a>
+            </div>
+
             <hr class="receipt-divider">
+            
             <div class="receipt-row">
               <span id="receiptServiceName">Service Subtotal (x1):</span>
               <strong id="receiptServiceCost">₱0.00</strong>
             </div>
+
             <div class="receipt-row">
-              <span id="receiptLocationName">Transport Fee:</span>
-              <strong id="receiptFareCost">₱0.00</strong>
+              <span id="receiptLocationName">Base Home Service Fee:</span>
+              <strong id="receiptFareCost">₱350.00</strong>
             </div>
+
+            <!-- Ang Extra Distance & Note Row ay awtomatikong idadagdag dito ng script.js -->
+
             <hr class="receipt-divider">
+
             <div class="receipt-row total-row">
               <span>TOTAL PAYMENT:</span>
-              <strong id="pcTotalPrice">₱0.00</strong>
+              <strong id="pcTotalPrice" style="color: #22c55e;">₱0.00</strong>
             </div>
           </div>
-          <div class="form-group">
-  <label for="clientAddress">Address / Lokasyon:</label>
-  <input type="text" id="clientAddress" placeholder="Lagay ang kumpletong address">
-  
-  <!-- GPS Button -->
-  <button type="button" id="getLocBtn" class="btn-location" onclick="getClientLocation()">
-    <i class="fa-solid fa-location-crosshairs"></i> Gamitin ang Aking Live Location
-  </button>
-  
-  <!-- Dito lilitaw ang Status at KM ng Client -->
-  <div id="locationStatus" class="location-status-text"></div>
-</div>
-          <!-- RECEIPT PREVIEW MODAL / POP-UP -->
-<div id="receiptModal" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fa-solid fa-receipt"></i> Ang Iyong Resibo</h3>
-      <button type="button" class="close-modal-btn" onclick="closeReceiptModal()">&times;</button>
-    </div>
-    
-    <div class="modal-body">
-      <p class="modal-instruction">
-        <i class="fa-solid fa-circle-info"></i> I-download o i-save ang resibo sa ibaba para ma-attach mo ito sa aming chat!
-      </p>
-      
-      <!-- Dito lalabas ang na-convert na Image Receipt -->
-      <div id="modalImageContainer" class="modal-img-container">
-        <!-- Dynamic Image via JS -->
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <a id="downloadReceiptBtn" class="btn-primary modal-btn-save" download="PC_Service_Receipt.png">
-        <i class="fa-solid fa-download"></i> Save / Download Image
-      </a>
-      <a id="proceedMessengerBtn" class="btn-secondary modal-btn-messenger" target="_blank">
-        <i class="fa-brands fa-facebook-messenger"></i> Proceed to Messenger
-      </a>
-    </div>
-  </div>
-</div>
         </div>
 
         <button type="submit" class="btn-primary btn-block">
@@ -334,6 +307,36 @@
       </form>
     </div>
   </section>
+
+  <!-- RECEIPT PREVIEW MODAL / POP-UP -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-receipt"></i> Ang Iyong Resibo</h3>
+        <button type="button" class="close-modal-btn" onclick="closeReceiptModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-instruction">
+          <i class="fa-solid fa-circle-info"></i> I-download o i-save ang resibo sa ibaba para ma-attach mo ito sa aming chat!
+        </p>
+        
+        <!-- Dito lalabas ang na-convert na Image Receipt -->
+        <div id="modalImageContainer" class="modal-img-container">
+          <!-- Dynamic Image via JS -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <a id="downloadReceiptBtn" class="btn-primary modal-btn-save" download="PC_Service_Receipt.png">
+          <i class="fa-solid fa-download"></i> Save / Download Image
+        </a>
+        <a id="proceedMessengerBtn" class="btn-secondary modal-btn-messenger" target="_blank">
+          <i class="fa-brands fa-facebook-messenger"></i> Proceed to Messenger
+        </a>
+      </div>
+    </div>
+  </div>
 
   <footer>
     <p>&copy; 2026 Justine Freelance PC Service. All rights reserved.</p>
