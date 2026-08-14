@@ -119,7 +119,7 @@ function renderClientMap(lat, lng) {
       attribution: '© OpenStreetMap'
     }).addTo(mapInstance);
 
-    // 1. Marker para sa TECH / SHOP LOCATION (May Nakalitaw na Label)
+    // 1. Marker para sa TECH / SHOP LOCATION
     const shopMarker = L.marker([SHOP_LAT, SHOP_LNG]).addTo(mapInstance)
       .bindTooltip("👨‍🔧 Tech Location", { 
         permanent: true, 
@@ -127,7 +127,7 @@ function renderClientMap(lat, lng) {
         className: 'map-label-tech'
       });
 
-    // 2. Marker para sa CLIENT LOCATION (May Nakalitaw na Label)
+    // 2. Marker para sa CLIENT LOCATION
     const clientMarker = L.marker([lat, lng]).addTo(mapInstance)
       .bindTooltip("📍 Client Location", { 
         permanent: true, 
@@ -142,7 +142,7 @@ function renderClientMap(lat, lng) {
     ];
     L.polyline(latlngs, { color: '#38bdf8', weight: 3, dashArray: '5, 10' }).addTo(mapInstance);
 
-    // I-fit ang mapa para kitang-kita pareho ang Shop at Client
+    // I-fit ang mapa
     const group = new L.featureGroup([shopMarker, clientMarker]);
     mapInstance.fitBounds(group.getBounds().pad(0.3));
   }
@@ -154,7 +154,6 @@ function renderClientMap(lat, lng) {
 function calculatePCTotal() {
   const pcServiceSelect = document.getElementById("pcServiceSelect");
   const unitQuantity = document.getElementById("unitQuantity");
-  const clientNameInput = document.getElementById("clientName");
   const clientAddressInput = document.getElementById("clientAddress");
 
   if (!pcServiceSelect || !unitQuantity) return;
@@ -181,51 +180,44 @@ function calculatePCTotal() {
 
   if (document.getElementById("receiptRefNo")) {
     document.getElementById("receiptRefNo").textContent = "REF: #" + currentRefNo;
-    document.getElementById("receiptClientName").textContent = clientNameInput && clientNameInput.value.trim() !== "" ? clientNameInput.value : "---";
     document.getElementById("receiptAddress").textContent = clientAddressInput && clientAddressInput.value.trim() !== "" ? clientAddressInput.value : "---";
 
-    // 1. Service Cost
+    // 1. Service Subtotal
     document.getElementById("receiptServiceName").textContent = `${selectedService} (x${quantity}):`;
     document.getElementById("receiptServiceCost").textContent = "₱" + subtotalService.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // 2. Base Home Service Fee
-    document.getElementById("receiptLocationName").textContent = `Base Home Service Fee standard (${BASE_DIST} km):`;
+    document.getElementById("receiptLocationName").textContent = `Base Home Service Fee (${BASE_DIST} km):`;
     document.getElementById("receiptFareCost").textContent = "₱" + BASE_FEE.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 3. Extra Distance & Location Breakdown
-    let extraContainer = document.getElementById("receiptExtraContainer");
-    const fareRow = document.getElementById("receiptFareCost").parentElement;
+    // 3. Extra Distance Breakdown (🟡 YELLOW pag may extra distance, 🟢 GREEN pag wala)
+    const extraContainer = document.getElementById("receiptExtraContainer");
 
-    if (!extraContainer) {
-      extraContainer = document.createElement("div");
-      extraContainer.id = "receiptExtraContainer";
-      fareRow.parentNode.insertBefore(extraContainer, fareRow.nextSibling);
+    if (extraContainer) {
+      let noteText = "";
+      let extraColor = (clientDistanceKM > BASE_DIST) ? "#f59e0b" : "#10b981";
+
+      if (clientDistanceKM > BASE_DIST) {
+        noteText = `📌 Paalala: Dahil ${clientDistanceKM.toFixed(1)}km ang iyong lokasyon (lagpas sa standard ${BASE_DIST}km), may karagdagang ₱${RATE_PER_KM.toFixed(2)} bawat lumagpas na kilometro.`;
+      } else {
+        const currentLocDisplay = clientDistanceKM > 0 ? `${clientDistanceKM.toFixed(1)} km` : "N/A";
+        noteText = `📌 Paalala: Ang iyong lokasyon (${currentLocDisplay}) ay pasok sa standard distance (≤${BASE_DIST}km) kaya walang karagdagang charge.`;
+      }
+
+      extraContainer.innerHTML = `
+        <div class="receipt-row">
+          <span class="receipt-label">Detected Client Distance:</span>
+          <strong class="receipt-value">${clientDistanceKM > 0 ? clientDistanceKM.toFixed(1) + " km" : "Hindi pa na-detect"}</strong>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label" style="color: ${extraColor};">+ Extra Distance (+${extraKM.toFixed(1)} km):</span>
+          <strong class="receipt-value" style="color: ${extraColor};">+₱${extraDistanceFee.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+        </div>
+        <div class="receipt-note">
+          ${noteText}
+        </div>
+      `;
     }
-
-    let noteText = "";
-    let extraFeeTextColor = "#f59e0b";
-
-    if (clientDistanceKM > BASE_DIST) {
-      noteText = `📌 Paalala: Dahil ${clientDistanceKM.toFixed(1)}km ang iyong lokasyon (lagpas sa standard ${BASE_DIST}km), may karagdagang ₱${RATE_PER_KM.toFixed(2)} bawat lumagpas na kilometro.`;
-    } else {
-      extraFeeTextColor = "#10b981";
-      const currentLocDisplay = clientDistanceKM > 0 ? `${clientDistanceKM.toFixed(1)} km` : "N/A";
-      noteText = `📌 Paalala: Ang iyong lokasyon (${currentLocDisplay}) ay pasok sa standard distance (≤${BASE_DIST}km) kaya walang karagdagang charge.`;
-    }
-
-    extraContainer.innerHTML = `
-      <div style="display: flex; justify-content: space-between; margin-top: 4px; color: #94a3b8; font-size: 13px;">
-        <span>Your location now is:</span>
-        <strong>(${clientDistanceKM > 0 ? clientDistanceKM.toFixed(1) + " km" : "Hindi pa na-detect"})</strong>
-      </div>
-      <div style="display: flex; justify-content: space-between; margin-top: 4px; color: ${extraFeeTextColor}; font-weight: bold;">
-        <span>+ Extra Distance (+${extraKM.toFixed(1)} km):</span>
-        <span>+₱${extraDistanceFee.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-      </div>
-      <div style="font-size: 11px; color: #cbd5e1; font-style: italic; margin-top: 6px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 4px;">
-        ${noteText}
-      </div>
-    `;
 
     // 4. TOTAL PAYMENT
     document.getElementById("pcTotalPrice").textContent = "₱" + grandTotal.toLocaleString('en-PH', {
@@ -240,7 +232,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const elementsToWatch = [
     "pcServiceSelect",
     "unitQuantity",
-    "clientName",
     "clientAddress"
   ];
 
@@ -254,11 +245,10 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   calculatePCTotal();
-  showSlides(slideIndex); // Simulan ang Slideshow sa pag-load ng page
 });
 
 // ==========================================
-// 5. BOOKING SUBMIT (CROSS-PLATFORM SAFE)
+// 5. BOOKING SUBMIT (IPHONE & ANDROID COMPATIBLE)
 // ==========================================
 function sendPCBooking(event) {
   event.preventDefault();
@@ -282,7 +272,7 @@ function sendPCBooking(event) {
   const isAndroid = /Android/i.test(ua);
   const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1);
 
-  // Android In-App Redirect Fix
+  // Android In-App Browser Redirect Fix
   if (isAndroid && isInApp) {
     const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
     const chromeIntent = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
@@ -305,24 +295,25 @@ function sendPCBooking(event) {
     const blob = dataURItoBlob(imageDataUrl);
     const blobUrl = URL.createObjectURL(blob);
 
+    // Render ng totoong <img> element na pwedeng i-long press sa iPhone/Android
     const imgContainer = document.getElementById("modalImageContainer");
     if (imgContainer) {
-      imgContainer.innerHTML = `<img src="${imageDataUrl}" alt="Booking Receipt">`;
+      imgContainer.innerHTML = `<img src="${imageDataUrl}" alt="Booking Receipt" style="width: 100%; height: auto; display: block; border-radius: 8px;">`;
     }
 
+    // Direct Download Link
     const downloadBtn = document.getElementById("downloadReceiptBtn");
     if (downloadBtn) {
       downloadBtn.href = blobUrl;
       downloadBtn.download = `Receipt_${currentRefNo}.png`;
     }
 
-    const clientName = document.getElementById("clientName") ? document.getElementById("clientName").value : "";
     const clientAddress = document.getElementById("clientAddress") ? document.getElementById("clientAddress").value : "";
     const total = document.getElementById("pcTotalPrice") ? document.getElementById("pcTotalPrice").textContent : "";
     const distText = `${clientDistanceKM.toFixed(2)} km`;
     const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${clientLat},${clientLng}`;
 
-    const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nName: ${clientName}\nAddress: ${clientAddress}\nDistance: ${distText}\nMap Route: ${gmapsUrl}\nTotal: ${total}`);
+    const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nAddress: ${clientAddress}\nDistance: ${distText}\nMap Route: ${gmapsUrl}\nTotal: ${total}`);
     
     // Cross-Platform Universal Messenger Link
     const messengerUrl = `https://m.me/${messengerUsername}?text=${textMsg}`;
@@ -350,39 +341,4 @@ function sendPCBooking(event) {
 function closeReceiptModal() {
   const modal = document.getElementById("receiptModal");
   if (modal) modal.classList.remove("active");
-}
-
-// ==========================================
-// 6. SLIDESHOW / GALLERY CONTROLLER
-// ==========================================
-let slideIndex = 1;
-
-function changeSlide(n) {
-  showSlides(slideIndex += n);
-}
-
-function currentSlide(n) {
-  showSlides(slideIndex = n);
-}
-
-function showSlides(n) {
-  let i;
-  let slides = document.getElementsByClassName("slide");
-  let dots = document.getElementsByClassName("dot");
-  if (!slides || slides.length === 0) return;
-  
-  if (n > slides.length) { slideIndex = 1 }
-  if (n < 1) { slideIndex = slides.length }
-  
-  for (i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none";
-  }
-  for (i = 0; i < dots.length; i++) {
-    dots[i].className = dots[i].className.replace(" active", "");
-  }
-  
-  slides[slideIndex-1].style.display = "block";
-  if (dots[slideIndex-1]) {
-    dots[slideIndex-1].className += " active";
-  }
 }
