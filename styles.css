@@ -678,3 +678,26 @@ footer { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-
 .location-error {
   color: #ef4444; /* Red */
 }
+
+/* Custom Label Style sa Pin ng Mapa */
+.leaflet-tooltip.map-label-tech {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+  border: 1px solid #38bdf8 !important;
+  font-weight: bold;
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.leaflet-tooltip.map-label-client {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: 1px solid #f87171 !important;
+  font-weight: bold;
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
