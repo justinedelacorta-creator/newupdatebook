@@ -7,14 +7,12 @@ const SHOP_LNG = 125.4967342;
 
 let currentRefNo = "TF-" + Math.floor(1000 + Math.random() * 9000);
 let clientDistanceKM = 0;
-let computedFare = 350; // Default base rate (₱350)
-let hasLocationPermission = false; // Flag para siguraduhing nag-GPS ang client!
+let hasLocationPermission = false;
 
 // ==========================================
 // 2. HELPER FUNCTIONS & DISTANCE FORMULA
 // ==========================================
 
-// Helper: Convert Base64/DataURL to Blob File Object (Para sa Mobile Downloads)
 function dataURItoBlob(dataURI) {
   const byteString = atob(dataURI.split(',')[1]);
   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -27,27 +25,9 @@ function dataURItoBlob(dataURI) {
   return new Blob([ab], { type: mimeString });
 }
 
-// Compute Fare: ₱350 para sa unang 7.5km. Pag lumagpas, ₱350 ÷ 7.5km = ₱46.67/km sa sumobrang KM.
-function calculateFare(distanceKM) {
-  const BASE_DIST = 7.5; // Base distance (7.5 KM)
-  const BASE_RATE = 350; // Base rate (₱350)
-  
-  // Dynamic Rate: ₱350 ÷ 7.5km = ₱46.6667 per KM
-  const RATE_PER_KM = BASE_RATE / BASE_DIST; 
-
-  if (distanceKM <= BASE_DIST) {
-    return BASE_RATE; // ₱350 kapag 7.5km pababa
-  } else {
-    const extraDistance = distanceKM - BASE_DIST; // Sumobrang kilometro
-    const extraFee = extraDistance * RATE_PER_KM;   // Dagdag na singil
-    
-    return BASE_RATE + extraFee;
-  }
-}
-
 // Haversine Formula: GPS Distance Computation
 function getKilometers(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Radius ng mundo sa KM
+  const R = 6371; 
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = 
@@ -83,12 +63,8 @@ function getClientLocation() {
 
       // Kwentahin ang distansya
       clientDistanceKM = getKilometers(SHOP_LAT, SHOP_LNG, clientLat, clientLng);
-      computedFare = calculateFare(clientDistanceKM);
-
-      // NA-SET NA ANG GPS PERMISSION!
       hasLocationPermission = true;
 
-      // Display Status
       if (statusTxt) {
         statusTxt.className = "location-status-text location-success";
         statusTxt.innerHTML = `<i class="fa-solid fa-circle-check"></i> Nakuha ang lokasyon! Layo: <strong>${clientDistanceKM.toFixed(2)} km</strong>`;
@@ -96,7 +72,7 @@ function getClientLocation() {
       
       if (locBtn) locBtn.disabled = false;
 
-      // I-update ang resibo sa screen
+      // I-update ang resibo
       calculatePCTotal();
     },
     (error) => {
@@ -106,14 +82,14 @@ function getClientLocation() {
         statusTxt.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Hindi ma-detect ang lokasyon. Pakisuri ang Permiso sa GPS.`;
       }
       if (locBtn) locBtn.disabled = false;
-      alert("Kailangan po naming ma-detect ang inyong lokasyon para makwenta ang Home Service Rate bago mag-proceed.");
+      alert("Kailangan po naming ma-detect ang inyong lokasyon bago mag-proceed sa booking.");
     },
     { enableHighAccuracy: true, timeout: 10000 }
   );
 }
 
 // ==========================================
-// 4. COMPUTATION & LIVE RECEIPT DISPLAY
+// 4. COMPUTATION & RECEIPT BREAKDOWN
 // ==========================================
 function calculatePCTotal() {
   const pcServiceSelect = document.getElementById("pcServiceSelect");
@@ -125,25 +101,59 @@ function calculatePCTotal() {
 
   const serviceBasePrice = parseFloat(pcServiceSelect.value) || 0;
   const quantity = parseInt(unitQuantity.value) || 1;
-  const fareFee = computedFare; 
-
   const subtotalService = serviceBasePrice * quantity;
-  const grandTotal = subtotalService + fareFee;
 
+  // KWENTA NG HOME SERVICE FEE & EXTRA DISTANCE
+  const BASE_DIST = 7.5; // Base 7.5 KM
+  const BASE_FEE = 350;  // Fix ₱350 Base Fee
+  const RATE_PER_KM = BASE_FEE / BASE_DIST; // ₱46.67 per km sa lumagpas
+
+  let extraDistanceFee = 0;
+  let extraKM = 0;
+
+  if (clientDistanceKM > BASE_DIST) {
+    extraKM = clientDistanceKM - BASE_DIST;
+    extraDistanceFee = extraKM * RATE_PER_KM;
+  }
+
+  const grandTotal = subtotalService + BASE_FEE + extraDistanceFee;
   const selectedService = pcServiceSelect.options[pcServiceSelect.selectedIndex]?.getAttribute("data-name") || "Service";
 
+  // DISPLAY SA RESIBO
   if (document.getElementById("receiptRefNo")) {
     document.getElementById("receiptRefNo").textContent = "REF: #" + currentRefNo;
     document.getElementById("receiptClientName").textContent = clientNameInput && clientNameInput.value.trim() !== "" ? clientNameInput.value : "---";
     document.getElementById("receiptAddress").textContent = clientAddressInput && clientAddressInput.value.trim() !== "" ? clientAddressInput.value : "---";
 
+    // 1. Service Cost Display
     document.getElementById("receiptServiceName").textContent = `${selectedService} (x${quantity}):`;
-    document.getElementById("receiptServiceCost").textContent = "₱" + subtotalService.toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    document.getElementById("receiptServiceCost").textContent = "₱" + subtotalService.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    const distText = clientDistanceKM > 0 ? `(${clientDistanceKM.toFixed(1)} km)` : "(Base Rate ≤7.5km)";
-    document.getElementById("receiptLocationName").textContent = `Home Service Fee ${distText}:`;
-    document.getElementById("receiptFareCost").textContent = "₱" + fareFee.toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    // 2. Base Home Service Fee Display (Fix ₱350)
+    const distLabel = clientDistanceKM > 0 ? `(${clientDistanceKM.toFixed(1)} km total)` : "(≤7.5km)";
+    document.getElementById("receiptLocationName").textContent = `Home Service Base Fee ${distLabel}:`;
+    document.getElementById("receiptFareCost").textContent = "₱" + BASE_FEE.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    // 3. Extra Distance Fee Display (Lalabas lang kung > 7.5km)
+    let extraRow = document.getElementById("receiptExtraDistanceRow");
+    if (extraDistanceFee > 0) {
+      if (!extraRow) {
+        // Dynamic row insertion sa HTML resibo kung lumagpas sa 7.5km
+        const fareRow = document.getElementById("receiptFareCost").parentElement;
+        extraRow = document.createElement("div");
+        extraRow.id = "receiptExtraDistanceRow";
+        extraRow.className = fareRow.className;
+        fareRow.parentNode.insertBefore(extraRow, fareRow.nextSibling);
+      }
+      extraRow.innerHTML = `
+        <span>Extra Distance Fee (+${extraKM.toFixed(1)} km):</span>
+        <strong style="color: #f59e0b;">+₱${extraDistanceFee.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+      `;
+    } else if (extraRow) {
+      extraRow.remove(); // Tatanggalin ang extra row kung 7.5km pababa
+    }
+
+    // 4. TOTAL PAYMENT
     document.getElementById("pcTotalPrice").textContent = "₱" + grandTotal.toLocaleString('en-PH', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
@@ -178,28 +188,24 @@ document.addEventListener("DOMContentLoaded", function() {
 function sendPCBooking(event) {
   event.preventDefault();
 
-  // ⚠️ STRICT CHECK: KUNG HINDI PA NAG-LIVELOCATION ANG CLIENT
   if (!hasLocationPermission) {
-    alert("⚠️ PAALALA: Pindutin muna ang 'Gamitin ang Aking Live Location' button para makwenta ang tamang Home Service Rate bago mag-kumpirma.");
+    alert("⚠️ PAALALA: Pindutin muna ang 'Gamitin ang Aking Live Location' button para ma-detect ang iyong lokasyon bago mag-kumpirma.");
     
-    // Auto-scroll papunta sa GPS Button
     const locBtn = document.getElementById("getLocBtn");
     if (locBtn) {
       locBtn.focus();
       locBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    return; // HIHINTO DITO, HINDI MAG-PROCEED!
+    return;
   }
 
   const messengerUsername = "justine.delacorta"; 
   const receiptElement = document.querySelector(".receipt-container");
   if (!receiptElement) return;
 
-  // Detect kung naka-In-App Browser ng Messenger / Facebook
   const ua = navigator.userAgent || navigator.vendor || window.opera;
   const isMessenger = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1);
 
-  // KUNG NAKA-MESSENGER: Force Chrome Open
   if (isMessenger) {
     const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
     const chromeIntent = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
@@ -208,7 +214,6 @@ function sendPCBooking(event) {
     return;
   }
 
-  // KUNG OK NA ANG LAHAT: Proceed sa Receipt Generation
   const submitBtn = event.target.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.innerHTML;
   submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Ginagawa ang Resibo...`;
@@ -221,7 +226,6 @@ function sendPCBooking(event) {
     logging: false
   }).then(canvas => {
     const imageDataUrl = canvas.toDataURL("image/png");
-
     const blob = dataURItoBlob(imageDataUrl);
     const blobUrl = URL.createObjectURL(blob);
 
@@ -267,60 +271,4 @@ function sendPCBooking(event) {
 function closeReceiptModal() {
   const modal = document.getElementById("receiptModal");
   if (modal) modal.classList.remove("active");
-}
-
-// ==========================================
-// 6. SLIDESHOW JAVASCRIPT
-// ==========================================
-let slideIndex = 1;
-let autoSlideTimer;
-
-document.addEventListener("DOMContentLoaded", function() {
-  showSlides(slideIndex);
-  startAutoSlide();
-});
-
-function changeSlide(n) {
-  showSlides(slideIndex += n);
-  resetAutoSlide();
-}
-
-function currentSlide(n) {
-  showSlides(slideIndex = n);
-  resetAutoSlide();
-}
-
-function showSlides(n) {
-  let slides = document.getElementsByClassName("slide");
-  let dots = document.getElementsByClassName("dot");
-
-  if (slides.length === 0) return;
-
-  if (n > slides.length) { slideIndex = 1; }
-  if (n < 1) { slideIndex = slides.length; }
-
-  for (let i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none";
-  }
-
-  for (let i = 0; i < dots.length; i++) {
-    dots[i].className = dots[i].className.replace(" active", "");
-  }
-
-  slides[slideIndex - 1].style.display = "block";
-  if (dots.length > 0) {
-    dots[slideIndex - 1].className += " active";
-  }
-}
-
-function startAutoSlide() {
-  autoSlideTimer = setInterval(() => {
-    slideIndex++;
-    showSlides(slideIndex);
-  }, 4000);
-}
-
-function resetAutoSlide() {
-  clearInterval(autoSlideTimer);
-  startAutoSlide();
 }
