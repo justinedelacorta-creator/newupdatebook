@@ -85,12 +85,12 @@ function getClientLocation() {
       hasLocationPermission = false;
       if (statusTxt) {
         statusTxt.className = "location-status-text location-error";
-        statusTxt.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Hindi ma-detect ang lokasyon. Pakisuri ang Permiso sa GPS.`;
+        statusTxt.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Hindi ma-detect ang lokasyon. Paki-payagan ang Location Access sa iyong browser o phone settings.`;
       }
       if (locBtn) locBtn.disabled = false;
-      alert("Kailangan po naming ma-detect ang inyong lokasyon bago mag-proceed sa booking.");
+      alert("Kailangan po naming ma-detect ang inyong lokasyon bago mag-proceed sa booking. Pakisuri ang Location Permission sa iyong browser settings.");
     },
-    { enableHighAccuracy: true, timeout: 10000 }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 }
 
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // ==========================================
-// 5. BOOKING SUBMIT
+// 5. BOOKING SUBMIT (CROSS-PLATFORM SAFE)
 // ==========================================
 function sendPCBooking(event) {
   event.preventDefault();
@@ -279,12 +279,13 @@ function sendPCBooking(event) {
   if (!receiptElement) return;
 
   const ua = navigator.userAgent || navigator.vendor || window.opera;
-  const isMessenger = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1);
+  const isAndroid = /Android/i.test(ua);
+  const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1);
 
-  if (isMessenger) {
+  // Android In-App Redirect Fix
+  if (isAndroid && isInApp) {
     const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
     const chromeIntent = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-    
     window.location.href = chromeIntent;
     return;
   }
@@ -322,6 +323,8 @@ function sendPCBooking(event) {
     const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${clientLat},${clientLng}`;
 
     const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nName: ${clientName}\nAddress: ${clientAddress}\nDistance: ${distText}\nMap Route: ${gmapsUrl}\nTotal: ${total}`);
+    
+    // Cross-Platform Universal Messenger Link
     const messengerUrl = `https://m.me/${messengerUsername}?text=${textMsg}`;
     
     const messengerBtn = document.getElementById("proceedMessengerBtn");
