@@ -8,6 +8,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- HTML2Canvas Library para sa Image Generator ng Resibo -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+  (function() {
+    // 1. Suriin kung ang user ay gumagamit ng Android Mobile
+    var isAndroid = /Android/i.test(navigator.userAgent);
+    
+    // 2. Suriin kung nakatrabaho sa loob ng In-App Browser (Messenger, Facebook, Instagram, Line, etc.)
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    var isInApp = (ua.indexOf("FBAN") > -1) || 
+                   (ua.indexOf("FBAV") > -1) || 
+                   (ua.indexOf("Messenger") > -1) || 
+                   (ua.indexOf("Instagram") > -1);
+
+    // 3. Kung Android at In-App Browser, I-FORCE buksan sa Chrome!
+    if (isAndroid && isInApp) {
+      // Kunin ang kasalukuyang URL at alisin ang 'https://'
+      var currentUrl = window.location.href.replace(/^https?:\/\//, '');
+      
+      // Intent URL Format para sa Google Chrome Android App
+      var chromeIntent = "intent://" + currentUrl + "#Intent;scheme=https;package=com.android.chrome;end";
+      
+      // I-redirect sa Chrome
+      window.location.href = chromeIntent;
+    }
+  })();
+</script>
 </head>
 <body>
 

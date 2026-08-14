@@ -7,14 +7,14 @@ const SHOP_LNG = 125.4967342;
 
 let currentRefNo = "TF-" + Math.floor(1000 + Math.random() * 9000);
 let clientDistanceKM = 0;
-let computedFare = 350; // Default base rate
-let hasLocationPermission = false; // Flag para i-check kung kinuha na ang location!
+let computedFare = 350; // Default base rate (₱350)
+let hasLocationPermission = false; // Flag para siguraduhing nag-GPS ang client!
 
 // ==========================================
 // 2. HELPER FUNCTIONS & DISTANCE FORMULA
 // ==========================================
 
-// Helper: Convert Base64/DataURL to Blob File Object
+// Helper: Convert Base64/DataURL to Blob File Object (Para sa Mobile Downloads)
 function dataURItoBlob(dataURI) {
   const byteString = atob(dataURI.split(',')[1]);
   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -27,23 +27,27 @@ function dataURItoBlob(dataURI) {
   return new Blob([ab], { type: mimeString });
 }
 
-// Compute Fare batay sa kilometro (≤7.5km = ₱350, >7.5km = +₱35/km)
+// Compute Fare: ₱350 para sa unang 7.5km. Pag lumagpas, ₱350 ÷ 7.5km = ₱46.67/km sa sumobrang KM.
 function calculateFare(distanceKM) {
-  const BASE_DIST = 7.5;       
-  const BASE_RATE = 350;       
-  const EXTRA_RATE_PER_KM = 35; 
+  const BASE_DIST = 7.5; // Base distance (7.5 KM)
+  const BASE_RATE = 350; // Base rate (₱350)
+  
+  // Dynamic Rate: ₱350 ÷ 7.5km = ₱46.6667 per KM
+  const RATE_PER_KM = BASE_RATE / BASE_DIST; 
 
   if (distanceKM <= BASE_DIST) {
-    return BASE_RATE;
+    return BASE_RATE; // ₱350 kapag 7.5km pababa
   } else {
-    const extraDistance = distanceKM - BASE_DIST;
-    return BASE_RATE + (extraDistance * EXTRA_RATE_PER_KM);
+    const extraDistance = distanceKM - BASE_DIST; // Sumobrang kilometro
+    const extraFee = extraDistance * RATE_PER_KM;   // Dagdag na singil
+    
+    return BASE_RATE + extraFee;
   }
 }
 
 // Haversine Formula: GPS Distance Computation
 function getKilometers(lat1, lon1, lat2, lon2) {
-  const R = 6371; 
+  const R = 6371; // Radius ng mundo sa KM
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = 
@@ -81,7 +85,7 @@ function getClientLocation() {
       clientDistanceKM = getKilometers(SHOP_LAT, SHOP_LNG, clientLat, clientLng);
       computedFare = calculateFare(clientDistanceKM);
 
-      // NA-SET NA ANG PERMISSION!
+      // NA-SET NA ANG GPS PERMISSION!
       hasLocationPermission = true;
 
       // Display Status
@@ -178,13 +182,13 @@ function sendPCBooking(event) {
   if (!hasLocationPermission) {
     alert("⚠️ PAALALA: Pindutin muna ang 'Gamitin ang Aking Live Location' button para makwenta ang tamang Home Service Rate bago mag-kumpirma.");
     
-    // I-highlight ang GPS button para makita agad ng client
+    // Auto-scroll papunta sa GPS Button
     const locBtn = document.getElementById("getLocBtn");
     if (locBtn) {
       locBtn.focus();
       locBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    return; // HIHINTO DITO, HINDI MAG-PROCEED SA RESIBO!
+    return; // HIHINTO DITO, HINDI MAG-PROCEED!
   }
 
   const messengerUsername = "justine.delacorta"; 
