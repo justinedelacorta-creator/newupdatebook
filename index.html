@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PC Repair & Home Service Specialist</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- HTML2Canvas Library para sa Image Generator ng Resibo -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo"><i class="fa-solid fa-laptop-code"></i> TechFix<span>Home</span></div>
+    <ul class="nav-links">
+      <li><a href="#rates">Service Rates</a></li>
+      <li><a href="#gallery">Proof of Service</a></li>
+      <li><a href="#calculator">Price Calculator</a></li>
+      <li><a href="#calculator" class="btn-primary btn-nav">Book Repair</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <span class="badge"><i class="fa-solid fa-house-laptop"></i> On-Site PC Repair & Troubleshooting</span>
+      <h1>Need PC Repair at Home? I’ll Come to You!</h1>
+      <p>On-site Computer Repair, Formatting, Deep Cleaning, and Hardware Upgrades at affordable rates.</p>
+      <div class="hero-btns">
+        <a href="#calculator" class="btn-primary"><i class="fa-solid fa-calculator"></i> Calculate Total Price</a>
+        <a href="#rates" class="btn-secondary"><i class="fa-solid fa-list-check"></i> Service Rates</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Service Rates List Section -->
+  <section id="rates" class="section">
+    <h2 class="section-title">Mga Standard Service Rates</h2>
+    <p class="section-subtitle">Transparent at tapat na presyo para sa inyong PC/Laptop care</p>
+
+    <div class="rates-grid">
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-compact-disc"></i></div>
+        <div class="rate-info">
+          <h3>Windows Installation (Format/Reformat)</h3>
+          <p>Install Windows Operating System with complete drivers and essential apps.</p>
+        </div>
+        <div class="rate-price">₱500</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-gamepad"></i></div>
+        <div class="rate-info">
+          <h3>Software and Games Installation</h3>
+          <p>Software and Games installation upon request depending on what you need (PM in advance).</p>
+        </div>
+        <div class="rate-price">₱350+</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-desktop"></i></div>
+        <div class="rate-info">
+          <h3>PC Assembly (Generic Case)</h3>
+          <p>Full assembly of PC parts with generic case setup.</p>
+        </div>
+        <div class="rate-price">₱500</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-computer"></i></div>
+        <div class="rate-info">
+          <h3>PC Assembly (Non-Generic Case)</h3>
+          <p>Full assembly of PC parts with gaming / non-generic case setup.</p>
+        </div>
+        <div class="rate-price">₱750</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-broom"></i></div>
+        <div class="rate-info">
+          <h3>PC Cleaning / Laptop</h3>
+          <p>Full PC cleaning and thermal re-paste for cooling and longevity.</p>
+        </div>
+        <div class="rate-price">₱700</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-wrench"></i></div>
+        <div class="rate-info">
+          <h3>PC Repair</h3>
+          <p>Repairing PC depending on the damage and issue of the unit.</p>
+        </div>
+        <div class="rate-price">₱500+</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="rate-info">
+          <h3>PC Hardware Upgrade</h3>
+          <p>Upgrading PC hardware depending on the components to be upgraded.</p>
+        </div>
+        <div class="rate-price">₱350+</div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-icon"><i class="fa-solid fa-house-chimney"></i></div>
+        <div class="rate-info">
+          <h3>Home Service Fee</h3>
+          <p>Home service fee depending on your location.</p>
+        </div>
+        <div class="rate-price">₱350+</div>
+      </div>
+    </div>
+  </section>
+
+ <!-- Photo / Video Gallery Section (Slideshow) -->
+<section id="gallery" class="section dark-bg">
+  <h2 class="section-title">Aktuwal na Home Service Projects</h2>
+  <p class="section-subtitle">Mga totoong kuha mula sa mga naayos na PC sa bahay ng kliyente</p>
+
+  <div class="slideshow-container">
+    <!-- Slide Items -->
+    <div class="slide fade">
+      <img src="image/image1.jpg" alt="PC Repair Work">
+      <div class="slide-caption">
+        <h3>Satisfied Customers</h3>
+        <p>Costumers</p>
+      </div>
+    </div>
+
+    <div class="slide fade">
+      <img src="image/image2.jpg" alt="Laptop Deep Cleaning">
+      <div class="slide-caption">
+        <h3>Laptop Deep Cleaning & Thermal Repaste</h3>
+        <p>Overheating Issue Fixed</p>
+      </div>
+    </div>
+
+    <div class="slide fade">
+      <img src="image/image4.jpg" alt="PC Assembly">
+      <div class="slide-caption">
+        <h3>Full PC Assembly & Cable Management</h3>
+        <p>Non-Generic Gaming Case Setup</p>
+      </div>
+    </div>
+
+    <div class="slide fade">
+      <img src="image/image5.jpg" alt="PC Assembly">
+      <div class="slide-caption">
+        <h3>Pisonet Setup and Troubleshooting</h3>
+        <p>PC/Laptop Blue Screen & System Crash Repair</p>
+      </div>
+    </div>
+    <div class="slide fade">
+      <img src="image/image3.jpg" alt="PC Assembly">
+      <div class="slide-caption">
+        <h3>PC/Laptop Blue Screen (BSOD) & System Error Fix</h3>
+        <p>Assemble pesonet</p>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <button class="prev-slide" onclick="changeSlide(-1)">&#10094;</button>
+    <button class="next-slide" onclick="changeSlide(1)">&#10095;</button>
+
+    <!-- Slide Indicators (Dots) -->
+    <div class="dots-container">
+      <span class="dot" onclick="currentSlide(1)"></span>
+      <span class="dot" onclick="currentSlide(2)"></span>
+      <span class="dot" onclick="currentSlide(3)"></span>
+      <span class="dot" onclick="currentSlide(4)"></span>
+      <span class="dot" onclick="currentSlide(5)"></span>
+    </div>
+  </div>
+</section>
+
+  <!-- Interactive PC Calculator & Booking Section -->
+  <section id="calculator" class="section">
+    <div class="calculator-card">
+      <h2 class="section-title">PC Service & Transport Fee Calculator</h2>
+      <p class="section-subtitle">Pumili ng kailangang ipagawa para makita agad ang tantyang presyo at resibo.</p>
+
+      <form id="pcBookingForm" onsubmit="sendPCBooking(event)">
+        <!-- Primary PC Service -->
+        <div class="form-group">
+          <label for="pcServiceSelect"><i class="fa-solid fa-wrench"></i> Primary PC Service:</label>
+          <select id="pcServiceSelect" class="form-control" onchange="calculatePCTotal()" required>
+            <option value="500" data-name="Windows Installation (Format/Reformat)">Windows Installation (Format/Reformat) — ₱500</option>
+            <option value="350" data-name="Software & Games Installation">Software & Games Installation — ₱350+</option>
+            <option value="500" data-name="PC Assembly (Generic Case)">PC Assembly (Generic Case) — ₱500</option>
+            <option value="750" data-name="PC Assembly (Non-Generic Case)">PC Assembly (Non-Generic Case) — ₱750</option>
+            <option value="700" data-name="PC / Laptop Deep Cleaning & Repaste">PC / Laptop Deep Cleaning & Repaste — ₱700</option>
+            <option value="500" data-name="PC Repair Service">PC Repair Service — ₱500+</option>
+            <option value="350" data-name="PC Hardware Upgrade">PC Hardware Upgrade — ₱350+</option>
+          </select>
+        </div>
+
+        <!-- Quantity of Units -->
+        <div class="form-group">
+          <label for="unitQuantity"><i class="fa-solid fa-desktop"></i> Bilang ng PC / Laptop Unit:</label>
+          <input type="number" id="unitQuantity" class="form-control" min="1" max="10" value="1" oninput="calculatePCTotal()" onchange="calculatePCTotal()" required>
+        </div>
+
+        <!-- Home Service Distance / Location Fee -->
+        <div class="form-group">
+          <label for="locationFeeSelect"><i class="fa-solid fa-location-dot"></i> Home Service Fee / Location:</label>
+          <select id="locationFeeSelect" class="form-control" onchange="calculatePCTotal()" required>
+            <option value="350" data-name="Standard Home Visit Fee">Standard Home Visit Fee — +₱350</option>
+            <option value="500" data-name="Far Location / Outside City">Far Location / Far Suburbs — +₱500</option>
+            <option value="0" data-name="Shop Drop-off / Meetup">Shop Visit / Drop-off (Walang Fee) — ₱0</option>
+          </select>
+        </div>
+
+        <!-- Details Input -->
+        <div class="form-group">
+          <label for="clientName"><i class="fa-solid fa-user"></i> Buong Pangalan:</label>
+          <input type="text" id="clientName" class="form-control" placeholder="hal. Juan Dela Cruz" oninput="calculatePCTotal()" required>
+        </div>
+
+        <div class="form-group">
+          <label for="clientAddress"><i class="fa-solid fa-map-pin"></i> Kumpletong Sektor / Address:</label>
+          <input type="text" id="clientAddress" class="form-control" placeholder="hal. Brgy. San Jose, Block 2 Lot 5" oninput="calculatePCTotal()" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pcIssue"><i class="fa-solid fa-triangle-exclamation"></i> Sira o Isyu ng PC/Laptop / Requests:</label>
+          <textarea id="pcIssue" class="form-control" rows="2" placeholder="hal. Ipapa-format, ayaw mag-boot, o Anong games/apps ang ipapalagay" required></textarea>
+        </div>
+
+        <!-- LIVE ON-SCREEN RECEIPT CARD -->
+        <div class="receipt-container">
+          <div class="receipt-header">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <h3>OFFICIAL BOOKING RECEIPT</h3>
+            <span id="receiptRefNo">REF: #TF-0000</span>
+          </div>
+
+          <div class="receipt-body">
+            <div class="receipt-row">
+              <span>Customer:</span>
+              <strong id="receiptClientName">---</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Address:</span>
+              <strong id="receiptAddress">---</strong>
+            </div>
+            <hr class="receipt-divider">
+            <div class="receipt-row">
+              <span id="receiptServiceName">Service Subtotal (x1):</span>
+              <strong id="receiptServiceCost">₱0.00</strong>
+            </div>
+            <div class="receipt-row">
+              <span id="receiptLocationName">Transport Fee:</span>
+              <strong id="receiptFareCost">₱0.00</strong>
+            </div>
+            <hr class="receipt-divider">
+            <div class="receipt-row total-row">
+              <span>KABUUANG BAYARIN:</span>
+              <strong id="pcTotalPrice">₱0.00</strong>
+            </div>
+          </div>
+          <div class="form-group">
+  <label for="clientAddress">Address / Lokasyon:</label>
+  <input type="text" id="clientAddress" placeholder="Lagay ang kumpletong address">
+  
+  <!-- GPS Button -->
+  <button type="button" id="getLocBtn" class="btn-location" onclick="getClientLocation()">
+    <i class="fa-solid fa-location-crosshairs"></i> Gamitin ang Aking Live Location
+  </button>
+  
+  <!-- Dito lilitaw ang Status at KM ng Client -->
+  <div id="locationStatus" class="location-status-text"></div>
+</div>
+          <!-- RECEIPT PREVIEW MODAL / POP-UP -->
+<div id="receiptModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-receipt"></i> Ang Iyong Resibo</h3>
+      <button type="button" class="close-modal-btn" onclick="closeReceiptModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <p class="modal-instruction">
+        <i class="fa-solid fa-circle-info"></i> I-download o i-save ang resibo sa ibaba para ma-attach mo ito sa aming chat!
+      </p>
+      
+      <!-- Dito lalabas ang na-convert na Image Receipt -->
+      <div id="modalImageContainer" class="modal-img-container">
+        <!-- Dynamic Image via JS -->
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <a id="downloadReceiptBtn" class="btn-primary modal-btn-save" download="PC_Service_Receipt.png">
+        <i class="fa-solid fa-download"></i> Save / Download Image
+      </a>
+      <a id="proceedMessengerBtn" class="btn-secondary modal-btn-messenger" target="_blank">
+        <i class="fa-brands fa-facebook-messenger"></i> Proceed to Messenger
+      </a>
+    </div>
+  </div>
+</div>
+        </div>
+
+        <button type="submit" class="btn-primary btn-block">
+          <i class="fa-brands fa-facebook-messenger"></i> Kumpirmahin at I-send sa Messenger
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 TechFixHome Freelance PC Service. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
