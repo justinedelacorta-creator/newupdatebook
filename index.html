@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Leaflet CSS & JS para sa Libreng Interactive Map -->
+  <!-- Leaflet CSS & JS para sa Interactive Map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -16,17 +16,14 @@
 
   <script>
   (function() {
-    // 1. Suriin kung ang user ay gumagamit ng Android Mobile
     var isAndroid = /Android/i.test(navigator.userAgent);
-    
-    // 2. Suriin kung nakatrabaho sa loob ng In-App Browser (Messenger, Facebook, Instagram, Line, etc.)
     var ua = navigator.userAgent || navigator.vendor || window.opera;
     var isInApp = (ua.indexOf("FBAN") > -1) || 
                    (ua.indexOf("FBAV") > -1) || 
                    (ua.indexOf("Messenger") > -1) || 
                    (ua.indexOf("Instagram") > -1);
 
-    // 3. Kung Android at In-App Browser, I-FORCE buksan sa Chrome!
+    // Kapag Android Messenger Browser, ilipat sa Chrome para sa Resibo Canvas/GPS Support
     if (isAndroid && isInApp) {
       var currentUrl = window.location.href.replace(/^https?:\/\//, '');
       var chromeIntent = "intent://" + currentUrl + "#Intent;scheme=https;package=com.android.chrome;end";
@@ -295,8 +292,6 @@
               <strong id="receiptFareCost">₱350.00</strong>
             </div>
 
-            <!-- Ang Extra Distance & Note Row ay awtomatikong idadagdag dito ng script.js -->
-
             <hr class="receipt-divider">
 
             <div class="receipt-row total-row">
@@ -326,7 +321,6 @@
           <i class="fa-solid fa-circle-info"></i> I-download o i-save ang resibo sa ibaba para ma-attach mo ito sa aming chat!
         </p>
         
-        <!-- Dito lalabas ang na-convert na Image Receipt -->
         <div id="modalImageContainer" class="modal-img-container">
           <!-- Dynamic Image via JS -->
         </div>
