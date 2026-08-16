@@ -1,7 +1,6 @@
 // ==========================================
 // 1. CONFIGURATION & SHOP LOCATION
 // ==========================================
-// 📍 EKSAKTONG COORDINATES NG SHOP MO (Toril, Davao City):
 const SHOP_LAT = 7.0205237;   
 const SHOP_LNG = 125.4967342; 
 
@@ -10,25 +9,11 @@ let clientDistanceKM = 0;
 let clientLat = 0;
 let clientLng = 0;
 let hasLocationPermission = false;
-let mapInstance = null; // Para sa Leaflet Map
+let mapInstance = null;
 
 // ==========================================
 // 2. HELPER FUNCTIONS & DISTANCE FORMULA
 // ==========================================
-
-function dataURItoBlob(dataURI) {
-  const byteString = atob(dataURI.split(',')[1]);
-  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ab], { type: mimeString });
-}
-
-// Haversine Formula: GPS Distance Computation
 function getKilometers(lat1, lon1, lat2, lon2) {
   const R = 6371; 
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -64,7 +49,6 @@ function getClientLocation() {
       clientLat = position.coords.latitude;
       clientLng = position.coords.longitude;
 
-      // Kwentahin ang distansya
       clientDistanceKM = getKilometers(SHOP_LAT, SHOP_LNG, clientLat, clientLng);
       hasLocationPermission = true;
 
@@ -75,10 +59,7 @@ function getClientLocation() {
       
       if (locBtn) locBtn.disabled = false;
 
-      // Render ng Live Map Image (Kasama ang Shop at Client Location)
       renderClientMap(clientLat, clientLng);
-
-      // I-update ang resibo
       calculatePCTotal();
     },
     (error) => {
@@ -94,32 +75,29 @@ function getClientLocation() {
   );
 }
 
-// Function para mag-draw ng Map sa Resibo (May Permanent Labels sa Pin)
 function renderClientMap(lat, lng) {
   const mapContainer = document.getElementById("receiptMapContainer");
   const gmapLink = document.getElementById("googleMapsLink");
 
   if (mapContainer) mapContainer.style.display = "block";
 
-  // Google Maps Direct Route Link (Mula Shop hanggang Client)
   if (gmapLink) {
     gmapLink.href = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${lat},${lng}`;
   }
 
-  // Render Leaflet Map Visual
   if (typeof L !== "undefined" && document.getElementById("receiptMap")) {
     if (mapInstance) {
-      mapInstance.remove(); // Reset map kung re-clicked
+      mapInstance.remove();
     }
 
     mapInstance = L.map('receiptMap');
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
+      crossOrigin: true,
       attribution: '© OpenStreetMap'
     }).addTo(mapInstance);
 
-    // 1. Marker para sa TECH / SHOP LOCATION
     const shopMarker = L.marker([SHOP_LAT, SHOP_LNG]).addTo(mapInstance)
       .bindTooltip("👨‍🔧 Tech Location", { 
         permanent: true, 
@@ -127,7 +105,6 @@ function renderClientMap(lat, lng) {
         className: 'map-label-tech'
       });
 
-    // 2. Marker para sa CLIENT LOCATION
     const clientMarker = L.marker([lat, lng]).addTo(mapInstance)
       .bindTooltip("📍 Client Location", { 
         permanent: true, 
@@ -135,37 +112,97 @@ function renderClientMap(lat, lng) {
         className: 'map-label-client'
       });
 
-    // 3. Guhit / Linya mula sa Shop papunta sa Client
     const latlngs = [
       [SHOP_LAT, SHOP_LNG],
       [lat, lng]
     ];
     L.polyline(latlngs, { color: '#38bdf8', weight: 3, dashArray: '5, 10' }).addTo(mapInstance);
 
-    // I-fit ang mapa
     const group = new L.featureGroup([shopMarker, clientMarker]);
     mapInstance.fitBounds(group.getBounds().pad(0.3));
+
+    setTimeout(() => {
+      mapInstance.invalidateSize();
+    }, 200);
   }
 }
 
 // ==========================================
-// 4. COMPUTATION & CLEAR RECEIPT BREAKDOWN
+// 4. COMPUTATION & RECEIPT BREAKDOWN
 // ==========================================
 function calculatePCTotal() {
   const pcServiceSelect = document.getElementById("pcServiceSelect");
   const unitQuantity = document.getElementById("unitQuantity");
   const clientAddressInput = document.getElementById("clientAddress");
+  const gamesOptionGroup = document.getElementById("gamesOptionGroup");
+  const gameQuantityInput = document.getElementById("gameQuantity");
+  const windowsFreebieGroup = document.getElementById("windowsFreebieGroup");
 
   if (!pcServiceSelect || !unitQuantity) return;
 
-  const serviceBasePrice = parseFloat(pcServiceSelect.value) || 0;
+  // Kumuha ng value mula sa dropdown
+  let serviceBasePrice = parseFloat(pcServiceSelect.value) || 0;
   const quantity = parseInt(unitQuantity.value) || 1;
-  const subtotalService = serviceBasePrice * quantity;
+  const selectedService = pcServiceSelect.options[pcServiceSelect.selectedIndex]?.getAttribute("data-name") || "Pumili ng Serbisyo...";
 
-  // PATAKARAN SA LOKASYON
+  const isGamesService = selectedService.includes("Software & Games Installation");
+  const isWindowsService = selectedService.includes("Windows Installation");
+  const isPCRepairService = selectedService.toLowerCase().includes("pc repair") || selectedService.toLowerCase().includes("troubleshooting");
+
+  // I-override ang rate sa ₱600 kapag PC Repair Service ang napili
+  if (isPCRepairService) {
+    serviceBasePrice = 600;
+  }
+
+  if (gamesOptionGroup) gamesOptionGroup.style.display = isGamesService ? "block" : "none";
+  if (windowsFreebieGroup) windowsFreebieGroup.style.display = isWindowsService ? "block" : "none";
+
+  if (serviceBasePrice === 0) {
+    if (document.getElementById("receiptRefNo")) {
+      document.getElementById("receiptRefNo").textContent = "REF: #" + currentRefNo;
+      document.getElementById("receiptAddress").textContent = clientAddressInput && clientAddressInput.value.trim() !== "" ? clientAddressInput.value : "---";
+
+      document.getElementById("receiptServiceName").textContent = "Service Subtotal:";
+      document.getElementById("receiptServiceCost").textContent = "₱0.00";
+
+      document.getElementById("receiptLocationName").textContent = "Base Home Service Fee:";
+      document.getElementById("receiptFareCost").textContent = "₱0.00";
+
+      const extraContainer = document.getElementById("receiptExtraContainer");
+      if (extraContainer) {
+        extraContainer.innerHTML = `
+          <div class="receipt-note">
+            📌 Pumili muna ng serbisyo sa itaas para lumabas ang aktwal na kalkulasyon.
+          </div>
+        `;
+      }
+
+      document.getElementById("pcTotalPrice").textContent = "₱0.00";
+    }
+    return;
+  }
+
+  let subtotalService = 0;
+  let serviceLabelText = "";
+
+  if (isGamesService) {
+    const gameCount = parseInt(gameQuantityInput.value) || 1;
+    subtotalService = (250 * gameCount) * quantity;
+    serviceLabelText = `Software & Games (${gameCount} pcs x ₱250, ${quantity} unit/s):`;
+  } else if (isWindowsService) {
+    subtotalService = serviceBasePrice * quantity;
+    serviceLabelText = `Windows Format (w/ FREE MS Office) (x${quantity}):`;
+  } else if (isPCRepairService) {
+    subtotalService = 600 * quantity;
+    serviceLabelText = `PC Repair Service (₱600 x ${quantity}):`;
+  } else {
+    subtotalService = serviceBasePrice * quantity;
+    serviceLabelText = `${selectedService} (x${quantity}):`;
+  }
+
   const BASE_DIST = 7.5; 
-  const BASE_FEE = 350;  
-  const RATE_PER_KM = BASE_FEE / BASE_DIST; // ₱46.6667 per km
+  const BASE_FEE = 300; // ₱300 Minimum Distance Fee
+  const RATE_PER_KM = BASE_FEE / BASE_DIST;
 
   let extraDistanceFee = 0;
   let extraKM = 0;
@@ -176,21 +213,17 @@ function calculatePCTotal() {
   }
 
   const grandTotal = subtotalService + BASE_FEE + extraDistanceFee;
-  const selectedService = pcServiceSelect.options[pcServiceSelect.selectedIndex]?.getAttribute("data-name") || "Service";
 
   if (document.getElementById("receiptRefNo")) {
     document.getElementById("receiptRefNo").textContent = "REF: #" + currentRefNo;
     document.getElementById("receiptAddress").textContent = clientAddressInput && clientAddressInput.value.trim() !== "" ? clientAddressInput.value : "---";
 
-    // 1. Service Subtotal
-    document.getElementById("receiptServiceName").textContent = `${selectedService} (x${quantity}):`;
+    document.getElementById("receiptServiceName").textContent = serviceLabelText;
     document.getElementById("receiptServiceCost").textContent = "₱" + subtotalService.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 2. Base Home Service Fee
     document.getElementById("receiptLocationName").textContent = `Base Home Service Fee (${BASE_DIST} km):`;
     document.getElementById("receiptFareCost").textContent = "₱" + BASE_FEE.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 3. Extra Distance Breakdown (🟡 YELLOW pag may extra distance, 🟢 GREEN pag wala)
     const extraContainer = document.getElementById("receiptExtraContainer");
 
     if (extraContainer) {
@@ -219,7 +252,6 @@ function calculatePCTotal() {
       `;
     }
 
-    // 4. TOTAL PAYMENT
     document.getElementById("pcTotalPrice").textContent = "₱" + grandTotal.toLocaleString('en-PH', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
@@ -227,12 +259,12 @@ function calculatePCTotal() {
   }
 }
 
-// Event Listeners & Initialization
 document.addEventListener("DOMContentLoaded", function() {
   const elementsToWatch = [
     "pcServiceSelect",
     "unitQuantity",
-    "clientAddress"
+    "clientAddress",
+    "gameQuantity"
   ];
 
   elementsToWatch.forEach(function(id) {
@@ -248,14 +280,20 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // ==========================================
-// 5. BOOKING SUBMIT (IPHONE & ANDROID COMPATIBLE)
+// 5. ACCURATE DOWNLOAD & REDIRECT (iOS / ANDROID)
 // ==========================================
 function sendPCBooking(event) {
   event.preventDefault();
 
+  const pcServiceSelect = document.getElementById("pcServiceSelect");
+  if (!pcServiceSelect || pcServiceSelect.value === "0") {
+    alert("⚠️ PAALALA: Pumili muna ng serbisyo sa dropdown list bago mag-kumpirma.");
+    pcServiceSelect.focus();
+    return;
+  }
+
   if (!hasLocationPermission) {
     alert("⚠️ PAALALA: Pindutin muna ang 'Gamitin ang Aking Live Location' button para ma-detect ang iyong lokasyon bago mag-kumpirma.");
-    
     const locBtn = document.getElementById("getLocBtn");
     if (locBtn) {
       locBtn.focus();
@@ -268,74 +306,91 @@ function sendPCBooking(event) {
   const receiptElement = document.querySelector(".receipt-container");
   if (!receiptElement) return;
 
-  const ua = navigator.userAgent || navigator.vendor || window.opera;
-  const isAndroid = /Android/i.test(ua);
-  const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1);
-
-  // Android In-App Browser Redirect Fix
-  if (isAndroid && isInApp) {
-    const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
-    const chromeIntent = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-    window.location.href = chromeIntent;
-    return;
-  }
-
   const submitBtn = event.target.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.innerHTML;
-  submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Ginagawa ang Resibo...`;
+  submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Inihahanda ang Resibo...`;
   submitBtn.disabled = true;
 
-  html2canvas(receiptElement, {
-    scale: 2,
-    backgroundColor: "#0f172a",
-    useCORS: true,
-    logging: false
-  }).then(canvas => {
-    const imageDataUrl = canvas.toDataURL("image/png");
-    const blob = dataURItoBlob(imageDataUrl);
-    const blobUrl = URL.createObjectURL(blob);
+  window.scrollTo(0, receiptElement.offsetTop - 50);
 
-    // Render ng totoong <img> element na pwedeng i-long press sa iPhone/Android
-    const imgContainer = document.getElementById("modalImageContainer");
-    if (imgContainer) {
-      imgContainer.innerHTML = `<img src="${imageDataUrl}" alt="Booking Receipt" style="width: 100%; height: auto; display: block; border-radius: 8px;">`;
+  setTimeout(() => {
+    html2canvas(receiptElement, {
+      scale: 2, 
+      backgroundColor: "#0f172a",
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      width: receiptElement.offsetWidth,
+      height: receiptElement.offsetHeight
+    }).then(canvas => {
+      
+      const dataUrl = canvas.toDataURL("image/png");
+      const fileName = `Receipt_${currentRefNo}.png`;
+
+      // 1. KUSANG I-DOWNLOAD AGAD ANG FILE
+      executeDownload(dataUrl, fileName);
+
+      // 2. IPREPARE ANG MESSENGER REDIRECT
+      const clientAddress = document.getElementById("clientAddress") ? document.getElementById("clientAddress").value : "";
+      const total = document.getElementById("pcTotalPrice") ? document.getElementById("pcTotalPrice").textContent : "";
+      const distText = `${clientDistanceKM.toFixed(2)} km`;
+      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${clientLat},${clientLng}`;
+
+      const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nAddress: ${clientAddress}\nDistance: ${distText}\nMap Route: ${gmapsUrl}\nTotal: ${total}`);
+      const messengerUrl = `https://m.me/${messengerUsername}?text=${textMsg}`;
+
+      const messengerBtn = document.getElementById("proceedMessengerBtn");
+      if (messengerBtn) messengerBtn.href = messengerUrl;
+
+      const reDownloadBtn = document.getElementById("downloadReceiptBtn");
+      if (reDownloadBtn) {
+        reDownloadBtn.onclick = function() {
+          executeDownload(dataUrl, fileName);
+        };
+      }
+
+      submitBtn.innerHTML = originalBtnText;
+      submitBtn.disabled = false;
+      
+      const modal = document.getElementById("receiptModal");
+      if (modal) modal.classList.add("active");
+
+    }).catch(err => {
+      console.error("Error generating receipt image:", err);
+      alert("Nagkaroon ng problema sa pag-download. Direkta ka na naming ililipat sa Messenger.");
+      submitBtn.innerHTML = originalBtnText;
+      submitBtn.disabled = false;
+      window.location.href = `https://m.me/${messengerUsername}`;
+    });
+  }, 350);
+}
+
+// Function na accurate para sa Safari (iOS/iPhone) at Chrome (Android)
+function executeDownload(dataUrl, fileName) {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  if (isIOS) {
+    const newTab = window.open();
+    if (newTab) {
+      newTab.document.write(`<img src="${dataUrl}" style="width:100%; height:auto;" />`);
+      newTab.document.title = fileName;
+    } else {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = fileName;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-
-    // Direct Download Link
-    const downloadBtn = document.getElementById("downloadReceiptBtn");
-    if (downloadBtn) {
-      downloadBtn.href = blobUrl;
-      downloadBtn.download = `Receipt_${currentRefNo}.png`;
-    }
-
-    const clientAddress = document.getElementById("clientAddress") ? document.getElementById("clientAddress").value : "";
-    const total = document.getElementById("pcTotalPrice") ? document.getElementById("pcTotalPrice").textContent : "";
-    const distText = `${clientDistanceKM.toFixed(2)} km`;
-    const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${SHOP_LAT},${SHOP_LNG}&destination=${clientLat},${clientLng}`;
-
-    const textMsg = encodeURIComponent(`Hi! Magbo-book po ako ng PC Service (#${currentRefNo}).\nAddress: ${clientAddress}\nDistance: ${distText}\nMap Route: ${gmapsUrl}\nTotal: ${total}`);
-    
-    // Cross-Platform Universal Messenger Link
-    const messengerUrl = `https://m.me/${messengerUsername}?text=${textMsg}`;
-    
-    const messengerBtn = document.getElementById("proceedMessengerBtn");
-    if (messengerBtn) {
-      messengerBtn.href = messengerUrl;
-    }
-
-    submitBtn.innerHTML = originalBtnText;
-    submitBtn.disabled = false;
-    
-    const modal = document.getElementById("receiptModal");
-    if (modal) modal.classList.add("active");
-
-  }).catch(err => {
-    console.error("Error generating receipt image:", err);
-    alert("Nagkaroon ng problema. Direkta ka na naming ililipat sa Messenger.");
-    submitBtn.innerHTML = originalBtnText;
-    submitBtn.disabled = false;
-    window.location.href = `https://m.me/${messengerUsername}`;
-  });
+  } else {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
 
 function closeReceiptModal() {

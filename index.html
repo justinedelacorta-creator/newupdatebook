@@ -23,7 +23,6 @@
                    (ua.indexOf("Messenger") > -1) || 
                    (ua.indexOf("Instagram") > -1);
 
-    // Kapag Android Messenger Browser, ilipat sa Chrome para sa Resibo Canvas/GPS Support
     if (isAndroid && isInApp) {
       var currentUrl = window.location.href.replace(/^https?:\/\//, '');
       var chromeIntent = "intent://" + currentUrl + "#Intent;scheme=https;package=com.android.chrome;end";
@@ -36,10 +35,10 @@
 
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <div class="logo"><i class="fa-solid fa-laptop-code"></i> TechFix<span>Home</span></div>
+    <div class="logo"><i class="fa-solid fa-laptop-code"></i> Justine<span>HomeService</span></div>
   </nav>
 
-  <!-- Interactive PC Calculator & Booking Section Only -->
+  <!-- Interactive PC Calculator & Booking Section -->
   <section id="calculator" class="section" style="padding-top: 30px;">
     <div class="calculator-card">
       <h2 class="section-title">PC Service & Transport Fee Calculator</h2>
@@ -50,14 +49,29 @@
         <div class="form-group">
           <label for="pcServiceSelect"><i class="fa-solid fa-wrench"></i> Primary PC Service:</label>
           <select id="pcServiceSelect" class="form-control" onchange="calculatePCTotal()" required>
-            <option value="500" data-name="Windows Installation (Format/Reformat)">Windows Installation (Format/Reformat) — ₱500</option>
-            <option value="350" data-name="Software & Games Installation">Software & Games Installation — ₱350+</option>
+            <option value="0" data-name="Pumili ng Serbisyo..." selected disabled>-- Pumili ng Serbisyo --</option>
+            <option value="600" data-name="Windows Installation (Format/Reformat)">Windows Installation (Format/Reformat) — ₱600</option>
+            <option value="250" data-name="Software & Games Installation">Software & Games Installation — ₱250 / game</option>
             <option value="500" data-name="PC Assembly (Generic Case)">PC Assembly (Generic Case) — ₱500</option>
             <option value="750" data-name="PC Assembly (Non-Generic Case)">PC Assembly (Non-Generic Case) — ₱750</option>
             <option value="700" data-name="PC / Laptop Deep Cleaning & Repaste">PC / Laptop Deep Cleaning & Repaste — ₱700</option>
-            <option value="500" data-name="PC Repair Service">PC Repair Service — ₱500+</option>
-            <option value="350" data-name="PC Hardware Upgrade">PC Hardware Upgrade — ₱350+</option>
+            <option value="600" data-name="PC Repair Service">PC Repair Service — ₱600</option>
+            <option value="500" data-name="PC Hardware Upgrade">PC Hardware Upgrade — ₱500</option>
           </select>
+        </div>
+
+        <!-- DYNAMIC FREEBIE NOTICE (Lalabas kapag Windows Installation ang napili) -->
+        <div id="windowsFreebieGroup" class="form-group" style="display: none;">
+          <div style="background-color: #064e3b; border: 1px solid #059669; color: #a7f3d0; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4;">
+            <i class="fa-solid fa-gift" style="color: #34d399; margin-right: 5px;"></i> 
+            <strong>Freebies Included:</strong> May kasama na itong Libreng <strong>MS Word, PowerPoint, at Excel</strong>!
+          </div>
+        </div>
+
+        <!-- DYNAMIC GAMES / SOFTWARE COUNT OPTION -->
+        <div class="form-group" id="gamesOptionGroup" style="display: none;">
+          <label for="gameQuantity"><i class="fa-solid fa-gamepad"></i> Bilang ng Games / Software (₱250 bawat isa):</label>
+          <input type="number" id="gameQuantity" class="form-control" min="1" max="20" value="1" oninput="calculatePCTotal()" onchange="calculatePCTotal()">
         </div>
 
         <!-- Quantity of Units -->
@@ -78,7 +92,7 @@
           <div id="locationStatus" class="location-status-text"></div>
         </div>
 
-        <!-- LIVE ON-SCREEN RECEIPT CARD (TRANSPARENT & EQUAL LAYOUT) -->
+        <!-- LIVE ON-SCREEN RECEIPT CARD -->
         <div class="receipt-container">
           <div class="receipt-header">
             <i class="fa-solid fa-file-invoice-dollar"></i>
@@ -92,9 +106,9 @@
               <strong id="receiptAddress" class="receipt-value">---</strong>
             </div>
 
-            <!-- 📍 LIVE LOCATION MAP (IN-RECEIPT) -->
+            <!-- LIVE LOCATION MAP -->
             <div id="receiptMapContainer" style="margin: 12px 0; display: none;">
-              <div id="receiptMap" style="height: 160px; width: 100%; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15);"></div>
+              <div id="receiptMap"></div>
               <a id="googleMapsLink" href="#" target="_blank" style="display: block; text-align: center; margin-top: 6px; font-size: 11px; color: #38bdf8; text-decoration: underline;">
                 📍 I-open sa Google Maps App
               </a>
@@ -104,22 +118,26 @@
             
             <!-- Service Subtotal -->
             <div class="receipt-row">
-              <span id="receiptServiceName" class="receipt-label">Service Subtotal (x1):</span>
+              <span id="receiptServiceName" class="receipt-label">Service Subtotal:</span>
               <strong id="receiptServiceCost" class="receipt-value">₱0.00</strong>
             </div>
 
             <!-- Base Home Service Fee -->
-            <div class="receipt-row">
+      0     <div class="receipt-row">
               <span id="receiptLocationName" class="receipt-label">Base Home Service Fee:</span>
-              <strong id="receiptFareCost" class="receipt-value">₱350.00</strong>
+              <strong id="receiptFareCost" class="receipt-value">₱0.00</strong>
             </div>
 
-            <!-- Dynamic Extra Distance & Rate Breakdown -->
-            <div id="receiptExtraContainer"></div>
+            <!-- Dynamic Extra Distance Breakdown -->
+            <div id="receiptExtraContainer">
+              <div class="receipt-note">
+                📌 Pumili muna ng serbisyo sa itaas para lumabas ang aktwal na kalkulasyon.
+              </div>
+            </div>
 
             <hr class="receipt-divider">
 
-            <!-- Grand Total -->
+  0         <!-- Grand Total -->
             <div class="receipt-row total-row">
               <span class="receipt-label">TOTAL PAYMENT:</span>
               <strong id="pcTotalPrice" class="receipt-value highlight-total">₱0.00</strong>
@@ -144,12 +162,10 @@
       
       <div class="modal-body">
         <p class="modal-instruction">
-          <i class="fa-solid fa-circle-info"></i> Pindutin ang <strong>Save / Download Image</strong> o i-press and hold (long-press) ang resibo para ma-save sa Gallery/Photos!
+          <i class="fa-solid fa-circle-info"></i> Pindutin ang <strong>Save / Download Image</strong> o i-press and hold ang resibo para ma-save sa Gallery/Photos!
         </p>
         
-        <div id="modalImageContainer" class="modal-img-container">
-          <!-- Dynamic Image via JS -->
-        </div>
+        <div id="modalImageContainer" class="modal-img-container"></div>
       </div>
 
       <div class="modal-footer">

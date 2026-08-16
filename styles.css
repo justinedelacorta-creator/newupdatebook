@@ -28,7 +28,7 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1001;
 }
 
 .navbar .logo {
@@ -203,16 +203,15 @@ textarea.form-control {
 }
 
 /* ==========================================
-   5. LIVE ON-SCREEN RECEIPT CARD (TRANSPARENT & EQUAL)
+   5. LIVE ON-SCREEN RECEIPT CARD
    ========================================== */
 .receipt-container {
-  background: rgba(15, 23, 42, 0.65); /* Translucent / Semi-transparent */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: #0f172a;
+  border: 1px solid #334155;
   border-radius: 12px;
   padding: 20px;
   margin-top: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .receipt-header {
@@ -245,7 +244,6 @@ textarea.form-control {
   font-size: 0.9rem;
 }
 
-/* Pantay (Equal) na Flex Alignment para sa bawat linya ng resibo */
 .receipt-row {
   display: flex;
   justify-content: space-between;
@@ -281,13 +279,13 @@ textarea.form-control {
   font-style: italic;
   margin-top: 6px;
   margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.05); /* Transparent note container */
-  padding: 8px;
+  background-color: #1e293b;
+  padding: 10px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #334155;
+  line-height: 1.4;
 }
 
-/* Grand Total Style */
 .total-row {
   font-size: 1.1rem;
   font-weight: 700;
@@ -305,21 +303,36 @@ textarea.form-control {
   font-weight: 800;
 }
 
-/* Leaflet Map Tooltip Labels */
+/* LEAFLET MAP SPECIFIC FIXES */
+#receiptMapContainer {
+  margin: 12px 0;
+  display: none;
+}
+
+#receiptMap {
+  height: 160px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
 .map-label-tech,
 .map-label-client {
-  background-color: #1e293b;
-  border: 1px solid #38bdf8;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 11px;
-  border-radius: 4px;
-  padding: 2px 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  background-color: #1e293b !important;
+  border: 1px solid #38bdf8 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  font-size: 11px !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
 
 .map-label-client {
-  border-color: #22c55e;
+  border-color: #22c55e !important;
 }
 
 /* ==========================================
@@ -335,7 +348,7 @@ textarea.form-control {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 2000;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -400,6 +413,7 @@ textarea.form-control {
   padding: 8px 12px;
   border-radius: 6px;
   text-align: center;
+  line-height: 1.4;
 }
 
 .modal-img-container img {
@@ -407,6 +421,7 @@ textarea.form-control {
   height: auto;
   border-radius: 8px;
   border: 1px solid #334155;
+  display: block;
 }
 
 .modal-footer {
@@ -439,4 +454,48 @@ footer {
 footer p {
   color: #64748b;
   font-size: 0.85rem;
+}
+
+/* ACCURATE RECEIPT IMAGE EXPORT STYLING */
+.receipt-container {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0);
+}
+
+.receipt-container * {
+  box-sizing: border-box;
+}
+
+/* CONFIRMATION MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
 }
